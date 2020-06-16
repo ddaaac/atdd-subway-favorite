@@ -1,10 +1,15 @@
 package wooteco.subway.domain.member;
 
-import org.apache.commons.lang3.StringUtils;
-import org.springframework.data.annotation.Id;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
+import org.apache.commons.lang3.StringUtils;
+
+@Entity
 public class Member {
     @Id
+    @GeneratedValue
     private Long id;
     private String email;
     private String name;

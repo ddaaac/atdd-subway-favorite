@@ -1,12 +1,27 @@
 package wooteco.subway.domain.line;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
+import javax.persistence.Embeddable;
+import javax.persistence.FetchType;
+import javax.persistence.OneToMany;
+
+@Embeddable
 public class LineStations {
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
     private Set<LineStation> stations;
 
     public LineStations(Set<LineStation> stations) {
         this.stations = stations;
+    }
+
+    public LineStations() {
     }
 
     public static LineStations empty() {
@@ -15,6 +30,10 @@ public class LineStations {
 
     public Set<LineStation> getStations() {
         return stations;
+    }
+
+    public void setStations(Set<LineStation> stations) {
+        this.stations = stations;
     }
 
     public void add(LineStation targetLineStation) {

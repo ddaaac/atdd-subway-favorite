@@ -2,7 +2,15 @@ package wooteco.subway.domain.line;
 
 import java.util.Objects;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+@Entity
 public class LineStation {
+    @Id
+    @GeneratedValue
+    private Long id;
     private Long preStationId;
     private Long stationId;
     private int distance;
@@ -13,6 +21,9 @@ public class LineStation {
         this.stationId = stationId;
         this.distance = distance;
         this.duration = duration;
+    }
+
+    public LineStation() {
     }
 
     public Long getPreStationId() {

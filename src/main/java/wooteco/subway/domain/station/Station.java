@@ -1,12 +1,17 @@
 package wooteco.subway.domain.station;
 
 import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.Id;
 
 import java.time.LocalDateTime;
 
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+
+@Entity
 public class Station {
     @Id
+    @GeneratedValue
     private Long id;
     private String name;
     @CreatedDate
