@@ -1,19 +1,25 @@
 package wooteco.subway.domain.line;
 
+import static java.util.Arrays.*;
+
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 
+import wooteco.subway.domain.station.Station;
+
 @Embeddable
 public class LineStations {
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "line")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "line")
     private List<LineStation> stations = new ArrayList<>();
 
     public LineStations(List<LineStation> stations) {
@@ -39,59 +45,42 @@ public class LineStations {
         if (stations.contains(targetLineStation)) {
             return;
         }
-        updatePreStationOfNextLineStation(targetLineStation.getPreStationId(), targetLineStation.getStationId());
+        updatePreStationOfNextLineStation(targetLineStation.getPreStation(), targetLineStation.getStation());
         stations.add(targetLineStation);
     }
 
-    private void remove(LineStation targetLineStation) {
-        updatePreStationOfNextLineStation(targetLineStation.getStationId(), targetLineStation.getPreStationId());
+    void remove(LineStation targetLineStation) {
+        updatePreStationOfNextLineStation(targetLineStation.getStation(), targetLineStation.getPreStation());
         stations.remove(targetLineStation);
     }
 
-    public void removeById(Long targetStationId) {
-        extractByStationId(targetStationId)
+    public void removeById(Station targetStation) {
+        extractByStationId(targetStation)
                 .ifPresent(this::remove);
     }
 
-    public List<Long> getStationIds() {
-        List<Long> result = new ArrayList<>();
-        extractNext(null, result);
-        return result;
+    private void updatePreStationOfNextLineStation(Station targetStation, Station newPreStation) {
+        extractByPreStationId(targetStation)
+                .ifPresent(it -> it.updatePreLineStation(newPreStation));
     }
 
-    private void extractNext(Long preStationId, List<Long> ids) {
-        stations.stream()
-                .filter(it -> Objects.equals(it.getPreStationId(), preStationId))
-                .findFirst()
-                .ifPresent(it -> {
-                    Long nextStationId = it.getStationId();
-                    ids.add(nextStationId);
-                    extractNext(nextStationId, ids);
-                });
-    }
-
-    private void updatePreStationOfNextLineStation(Long targetStationId, Long newPreStationId) {
-        extractByPreStationId(targetStationId)
-                .ifPresent(it -> it.updatePreLineStation(newPreStationId));
-    }
-
-    private Optional<LineStation> extractByStationId(Long stationId) {
+    private Optional<LineStation> extractByStationId(Station station) {
         return stations.stream()
-                .filter(it -> Objects.equals(it.getStationId(), stationId))
+                .filter(it -> Objects.equals(it.getStation(), station))
                 .findFirst();
     }
 
-    private Optional<LineStation> extractByPreStationId(Long preStationId) {
+    private Optional<LineStation> extractByPreStationId(Station preStation) {
         return stations.stream()
-                .filter(it -> Objects.equals(it.getPreStationId(), preStationId))
+                .filter(it -> Objects.equals(it.getPreStation(), preStation))
                 .findFirst();
     }
 
-    public int getTotalDistance() {
-        return stations.stream().mapToInt(it -> it.getDistance()).sum();
-    }
-
-    public int getTotalDuration() {
-        return stations.stream().mapToInt(it -> it.getDuration()).sum();
+    public List<Station> getAllStations() {
+        return stations.stream()
+            .flatMap(station -> Stream.of(station.getPreStation(), station.getStation()))
+            .filter(Objects::nonNull)
+            .distinct()
+            .collect(Collectors.toList());
     }
 }

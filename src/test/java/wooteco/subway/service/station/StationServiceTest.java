@@ -4,6 +4,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Transactional;
+
 import wooteco.subway.domain.line.Line;
 import wooteco.subway.domain.line.LineRepository;
 import wooteco.subway.domain.line.LineStation;
@@ -12,6 +14,7 @@ import wooteco.subway.domain.station.Station;
 import wooteco.subway.domain.station.StationRepository;
 
 import java.time.LocalTime;
+import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -32,26 +35,24 @@ public class StationServiceTest {
     private LineStationRepository lineStationRepository;
 
     @Test
+    @Transactional
     public void removeStation() {
         Station station1 = stationRepository.save(new Station("강남역"));
         Station station2 = stationRepository.save(new Station("역삼역"));
         Line line = lineRepository.save(new Line("2호선", LocalTime.of(5, 30), LocalTime.of(22, 30), 10));
 
-        LineStation lineStation1 = new LineStation(null, station1.getId(), 10, 10);
-        LineStation lineStation2 = new LineStation(station1.getId(), station2.getId(), 10, 10);
+        LineStation lineStation1 = new LineStation(null, station1, 10, 10);
+        LineStation lineStation2 = new LineStation(station1, station2, 10, 10);
         lineStationRepository.save(lineStation1);
         lineStationRepository.save(lineStation2);
-
+        line.addLineStation(lineStation1);
         line.addLineStation(lineStation2);
-        line.addLineStation(lineStation2);
-        lineRepository.save(line);
 
         stationService.deleteStationById(station1.getId());
-
         Optional<Station> resultStation = stationRepository.findById(station1.getId());
-        assertThat(resultStation).isEmpty();
 
         Line resultLine = lineRepository.findById(line.getId()).orElseThrow(RuntimeException::new);
+        assertThat(resultStation).isEmpty();
         assertThat(resultLine.getStations()).hasSize(1);
     }
 }

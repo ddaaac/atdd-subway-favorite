@@ -9,6 +9,8 @@ import java.time.LocalTime;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+import wooteco.subway.domain.station.Station;
+
 @DataJpaTest
 public class LineRepositoryTest {
     @Autowired
@@ -19,8 +21,10 @@ public class LineRepositoryTest {
         // given
         Line line = new Line("2호선", LocalTime.of(05, 30), LocalTime.of(22, 30), 5);
         Line persistLine = lineRepository.save(line);
-        persistLine.addLineStation(new LineStation(null, 1L, 10, 10));
-        persistLine.addLineStation(new LineStation(1L, 2L, 10, 10));
+        Station jamsil = new Station(1L, "잠실역");
+        Station dogok = new Station(2L, "도곡역");
+        persistLine.addLineStation(new LineStation(null, jamsil, 10, 10));
+        persistLine.addLineStation(new LineStation(jamsil, dogok, 10, 10));
 
         // when
         Line resultLine = lineRepository.save(persistLine);

@@ -26,7 +26,12 @@ public class StationService {
     }
 
     public void deleteStationById(Long id) {
-        lineStationService.deleteLineStationByStationId(id);
+        Station station = stationRepository.findById(id).orElseThrow(RuntimeException::new);
+        lineStationService.deleteLineStationByStation(station);
         stationRepository.deleteById(id);
+    }
+
+    public Station findById(Long stationId) {
+        return stationRepository.findById(stationId).orElseThrow(RuntimeException::new);
     }
 }

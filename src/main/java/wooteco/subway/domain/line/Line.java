@@ -13,6 +13,8 @@ import javax.persistence.Id;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
+import wooteco.subway.domain.station.Station;
+
 @Entity
 public class Line {
     @Id
@@ -97,11 +99,15 @@ public class Line {
         lineStation.setLine(this);
     }
 
-    public void removeLineStationById(Long stationId) {
-        stations.removeById(stationId);
+    public void removeLineStationBy(Station station) {
+        stations.removeById(station);
     }
 
-    public List<Long> getStationIds() {
-        return stations.getStationIds();
+    public List<Station> getAllStations() {
+        return stations.getAllStations();
+    }
+
+    public void removeLineStation(LineStation lineStation) {
+        stations.remove(lineStation);
     }
 }

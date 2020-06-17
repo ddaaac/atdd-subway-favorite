@@ -10,24 +10,36 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import wooteco.subway.domain.station.Station;
+
 @Entity
 public class LineStation {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "line_station_id")
     private Long id;
-    private Long preStationId;
-    private Long stationId;
+
     private int distance;
     private int duration;
+
+    @ManyToOne
+    @JoinColumn(name = "pre_station_id")
+    private Station preStation;
+
+    @ManyToOne
+    @JoinColumn(name = "station_id")
+    private Station station;
 
     @ManyToOne
     @JoinColumn(name = "line_id")
     private Line line;
 
-    public LineStation(Long preStationId, Long stationId, int distance, int duration) {
-        this.preStationId = preStationId;
-        this.stationId = stationId;
+    public LineStation(Station preStation, Station station, int distance, int duration) {
+        this.preStation = preStation;
+        this.station = station;
         this.distance = distance;
         this.duration = duration;
     }
@@ -35,12 +47,8 @@ public class LineStation {
     public LineStation() {
     }
 
-    public Long getPreStationId() {
-        return preStationId;
-    }
-
-    public Long getStationId() {
-        return stationId;
+    public Long getId() {
+        return id;
     }
 
     public int getDistance() {
@@ -55,6 +63,14 @@ public class LineStation {
         return line;
     }
 
+    public Station getPreStation() {
+        return preStation;
+    }
+
+    public Station getStation() {
+        return station;
+    }
+
     public void setLine(Line line) {
         if (Objects.equals(line, this.line)) {
             return;
@@ -63,28 +79,38 @@ public class LineStation {
         line.addLineStation(this);
     }
 
-    public void updatePreLineStation(Long preStationId) {
-        this.preStationId = preStationId;
+    public void setPreStation(Station preStation) {
+        this.preStation = preStation;
+    }
+
+    public void setStation(Station station) {
+        this.station = station;
+    }
+
+    public void updatePreLineStation(Station preStation) {
+        this.preStation = preStation;
     }
 
     public boolean isLineStationOf(Long preStationId, Long stationId) {
-        return this.preStationId == preStationId && this.stationId == stationId
-                || this.preStationId == stationId && this.stationId == preStationId;
+        return this.preStation.getId() == preStationId && this.station.getId() == stationId
+                || this.preStation.getId() == stationId && this.station.getId() == preStationId;
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        LineStation that = (LineStation) o;
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        LineStation that = (LineStation)o;
         return distance == that.distance &&
-                duration == that.duration &&
-                Objects.equals(preStationId, that.preStationId) &&
-                Objects.equals(stationId, that.stationId);
+            duration == that.duration &&
+            Objects.equals(preStation, that.preStation) &&
+            Objects.equals(station, that.station);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(preStationId, stationId, distance, duration);
+        return Objects.hash(preStation, station, distance, duration);
     }
 }

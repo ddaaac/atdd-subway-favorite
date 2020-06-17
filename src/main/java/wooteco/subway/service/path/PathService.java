@@ -46,7 +46,7 @@ public class PathService {
 
         List<LineStation> lineStations = lines.stream()
                 .flatMap(it -> it.getStations().stream())
-                .filter(it -> Objects.nonNull(it.getPreStationId()))
+                .filter(it -> Objects.nonNull(it.getPreStation()))
                 .collect(Collectors.toList());
 
         List<LineStation> paths = extractPathLineStation(path, lineStations);
