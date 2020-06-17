@@ -1,6 +1,8 @@
 package wooteco.subway.service.path;
 
 import org.springframework.stereotype.Service;
+
+import wooteco.subway.domain.line.LineStationRepository;
 import wooteco.subway.service.path.dto.PathResponse;
 import wooteco.subway.service.station.dto.StationResponse;
 import wooteco.subway.domain.line.Line;
@@ -20,11 +22,14 @@ public class PathService {
     private StationRepository stationRepository;
     private LineRepository lineRepository;
     private GraphService graphService;
+    private LineStationRepository lineStationRepository;
 
-    public PathService(StationRepository stationRepository, LineRepository lineRepository, GraphService graphService) {
+    public PathService(StationRepository stationRepository, LineRepository lineRepository, GraphService graphService,
+        LineStationRepository lineStationRepository) {
         this.stationRepository = stationRepository;
         this.lineRepository = lineRepository;
         this.graphService = graphService;
+        this.lineStationRepository = lineStationRepository;
     }
 
     public PathResponse findPath(String source, String target, PathType type) {

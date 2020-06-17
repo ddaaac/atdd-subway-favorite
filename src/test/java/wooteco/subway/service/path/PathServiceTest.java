@@ -55,7 +55,7 @@ public class PathServiceTest {
 
     @BeforeEach
     void setUp() {
-        pathService = new PathService(stationRepository, lineRepository, graphService);
+        pathService = new PathService(stationRepository, lineRepository, graphService, null); //TODO
 
         station1 = new Station(1L, STATION_NAME1);
         station2 = new Station(2L, STATION_NAME2);

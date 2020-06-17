@@ -2,19 +2,28 @@ package wooteco.subway.domain.line;
 
 import java.util.Objects;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 
 @Entity
 public class LineStation {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "line_station_id")
     private Long id;
     private Long preStationId;
     private Long stationId;
     private int distance;
     private int duration;
+
+    @ManyToOne
+    @JoinColumn(name = "line_id")
+    private Line line;
 
     public LineStation(Long preStationId, Long stationId, int distance, int duration) {
         this.preStationId = preStationId;
@@ -40,6 +49,18 @@ public class LineStation {
 
     public int getDuration() {
         return duration;
+    }
+
+    public Line getLine() {
+        return line;
+    }
+
+    public void setLine(Line line) {
+        if (Objects.equals(line, this.line)) {
+            return;
+        }
+        this.line = line;
+        line.addLineStation(this);
     }
 
     public void updatePreLineStation(Long preStationId) {

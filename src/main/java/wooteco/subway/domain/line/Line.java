@@ -3,31 +3,32 @@ package wooteco.subway.domain.line;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
-import java.util.Set;
 
+import javax.persistence.Column;
 import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
-import javax.persistence.OneToMany;
 
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 @Entity
 public class Line {
-    @Id @GeneratedValue
+    @Id
+    @GeneratedValue
+    @Column(name = "line_id")
     private Long id;
     private String name;
     private LocalTime startTime;
     private LocalTime endTime;
     private int intervalTime;
-    @CreatedDate
+    @CreationTimestamp
     private LocalDateTime createdAt;
-    @LastModifiedDate
+    @UpdateTimestamp
     private LocalDateTime updatedAt;
     @Embedded
-    private LineStations stations = LineStations.empty();
+    private LineStations stations;
 
     public Line() {
     }
@@ -37,6 +38,7 @@ public class Line {
         this.startTime = startTime;
         this.endTime = endTime;
         this.intervalTime = intervalTime;
+        this.stations = LineStations.empty();
     }
 
     public Line(String name, LocalTime startTime, LocalTime endTime, int intervalTime) {
@@ -63,7 +65,7 @@ public class Line {
         return intervalTime;
     }
 
-    public Set<LineStation> getStations() {
+    public List<LineStation> getStations() {
         return stations.getStations();
     }
 
@@ -92,6 +94,7 @@ public class Line {
 
     public void addLineStation(LineStation lineStation) {
         stations.add(lineStation);
+        lineStation.setLine(this);
     }
 
     public void removeLineStationById(Long stationId) {

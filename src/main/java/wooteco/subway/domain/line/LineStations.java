@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.Set;
 
 import javax.persistence.CascadeType;
 import javax.persistence.Embeddable;
@@ -14,10 +13,10 @@ import javax.persistence.OneToMany;
 
 @Embeddable
 public class LineStations {
-    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
-    private Set<LineStation> stations;
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, mappedBy = "line")
+    private List<LineStation> stations = new ArrayList<>();
 
-    public LineStations(Set<LineStation> stations) {
+    public LineStations(List<LineStation> stations) {
         this.stations = stations;
     }
 
@@ -25,18 +24,21 @@ public class LineStations {
     }
 
     public static LineStations empty() {
-        return new LineStations(new HashSet<>());
+        return new LineStations(new ArrayList<>());
     }
 
-    public Set<LineStation> getStations() {
+    public List<LineStation> getStations() {
         return stations;
     }
 
-    public void setStations(Set<LineStation> stations) {
+    public void setStations(List<LineStation> stations) {
         this.stations = stations;
     }
 
     public void add(LineStation targetLineStation) {
+        if (stations.contains(targetLineStation)) {
+            return;
+        }
         updatePreStationOfNextLineStation(targetLineStation.getPreStationId(), targetLineStation.getStationId());
         stations.add(targetLineStation);
     }
